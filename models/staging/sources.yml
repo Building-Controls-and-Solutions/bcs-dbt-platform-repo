@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw
     description: Raw data ingested from source systems
-    database: "{{ 'DB_PROD' if target.name == 'prod' else 'DB_DEV' }}"
+    database: DB_DEV
     schema: RAW
     
     tables:

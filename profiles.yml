@@ -1,94 +1,27 @@
-# dbt profiles configuration for BCS Platform
-# This file configures connections for different users and environments
-# Store this in the repository root or ~/.dbt/profiles.yml
+# DBT Profiles Configuration for Snowflake DBT Projects
+# When running within Snowflake DBT PROJECT objects, authentication is handled automatically
 
 bcs_platform:
-  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  target: dev
   outputs:
-    # Development environment - for BRANDON.JACKSON and other developers
+    # Development environment
     dev:
       type: snowflake
-      account: ftb40125.us-east-1
-      
-      # User authentication - use environment variable
-      user: "{{ env_var('SNOWFLAKE_USER', 'BRANDON.JACKSON') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      
-      # Role and warehouse for development
+      account: 'not needed'  # Handled by Snowflake
+      user: 'not needed'     # Handled by Snowflake
       role: DBT_DEVELOPER
-      warehouse: WH_DBT_DEV
-      
-      # Database configuration - developers work in DB_DEV
       database: DB_DEV
-      schema: "{{ env_var('DBT_SCHEMA', 'TRANSFORM') }}"
-      
-      # Connection settings
-      threads: 4
-      client_session_keep_alive: False
-      query_tag: 'dbt_dev'
-      
-    # CI environment - for pull request validation
-    ci:
-      type: snowflake
-      account: ftb40125.us-east-1
-      
-      # CI service account
-      user: "{{ env_var('SNOWFLAKE_CI_USER', 'DBT_RUNNER') }}"
-      password: "{{ env_var('SNOWFLAKE_CI_PASSWORD') }}"
-      
-      # Role and warehouse for CI
-      role: DBT_RUNNER
+      schema: DEV_BRANDON
       warehouse: WH_DBT_DEV
+      threads: 2
       
-      # Database configuration - CI validates in DB_DEV
-      database: DB_DEV
-      schema: "PR_{{ env_var('PR_NUMBER', 'TEST') }}"
-      
-      # Connection settings
-      threads: 4
-      client_session_keep_alive: False
-      query_tag: 'dbt_ci_pr_{{ env_var("PR_NUMBER", "test") }}'
-      
-    # Production environment - for DBT_RUNNER service account
+    # Production environment  
     prod:
       type: snowflake
-      account: ftb40125.us-east-1
-      
-      # Production service account
-      user: "{{ env_var('SNOWFLAKE_PROD_USER', 'DBT_RUNNER') }}"
-      password: "{{ env_var('SNOWFLAKE_PROD_PASSWORD') }}"
-      
-      # Role and warehouse for production
+      account: 'not needed'  # Handled by Snowflake
+      user: 'not needed'     # Handled by Snowflake
       role: DBT_RUNNER
-      warehouse: WH_DBT
-      
-      # Database configuration - production runs materialize to DB_PROD
       database: DB_PROD
-      schema: TRANSFORM
-      
-      # Connection settings
-      threads: 8
-      client_session_keep_alive: False
-      query_tag: 'dbt_prod_main'
-      
-    # User branch development - for feature branches
-    user_branch:
-      type: snowflake
-      account: ftb40125.us-east-1
-      
-      # User authentication
-      user: "{{ env_var('SNOWFLAKE_USER') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
-      
-      # Role and warehouse for branch development
-      role: DBT_DEVELOPER
-      warehouse: WH_DBT_DEV
-      
-      # Database configuration - branch development in DB_DEV with branch-specific schema
-      database: DB_DEV
-      schema: "BRANCH_{{ env_var('GIT_BRANCH', 'FEATURE') | replace('-', '_') | upper }}"
-      
-      # Connection settings
+      schema: PROD
+      warehouse: WH_DBT
       threads: 4
-      client_session_keep_alive: False
-      query_tag: 'dbt_branch_{{ env_var("GIT_BRANCH", "feature") }}'
