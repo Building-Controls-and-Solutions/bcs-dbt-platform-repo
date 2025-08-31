@@ -7,7 +7,8 @@ version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
-profile: 'bcs_platform'
+# When running from Snowflake, this is ignored and Snowflake provides the connection
+profile: 'default'
 
 # These configurations specify where dbt should look for different types of files.
 model-paths: ["models"]
