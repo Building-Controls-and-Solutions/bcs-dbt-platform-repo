@@ -1,0 +1,20 @@
+# Profiles for Snowflake dbt Project execution
+# When running from Snowflake, it automatically provides connection details
+# This file is required but the connection details are overridden by Snowflake
+
+default:
+  target: snowflake
+  outputs:
+    snowflake:
+      type: snowflake
+      # These values are automatically provided by Snowflake when executing
+      # EXECUTE DBT PROJECT command
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'placeholder') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'placeholder') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'placeholder') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'placeholder') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'placeholder') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'placeholder') }}"
+      schema: "{{ env_var('SNOWFLAKE_SCHEMA', 'TRANSFORM') }}"
+      threads: 4
+      client_session_keep_alive: False
