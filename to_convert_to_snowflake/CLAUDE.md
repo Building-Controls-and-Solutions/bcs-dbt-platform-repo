@@ -1,0 +1,1 @@
+All files in this folder came from MS SQL Server views and need to be converted to DBT views in Snowflake based upon the source tables supporting them which are in ING_P21 under the original name. All column names need to be uppercased. All table names need to be uppercased.

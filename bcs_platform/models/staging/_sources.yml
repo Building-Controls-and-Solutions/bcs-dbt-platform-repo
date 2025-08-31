@@ -1,0 +1,192 @@
+version: 2
+
+sources:
+  # P21 ERP System Data
+  - name: p21_ingestion
+    description: Data ingested from Prophet 21 (P21) ERP system via Estuary
+    database: "{{ var('source_database') }}"
+    schema: ING_P21
+    
+    # Configuration for source freshness checks
+    freshness:
+      warn_after: {count: 12, period: hour}
+      error_after: {count: 24, period: hour}
+    
+    tables:
+      # Chart of Accounts
+      - name: BCS_COA
+        description: BCS Chart of Accounts - Financial account structure
+        columns:
+          - name: NatAcct
+            description: Natural Account number (primary key)
+            tests:
+              - not_null
+              - unique
+          - name: AcctDescription
+            description: Account description
+          - name: "Acct No - Desc"
+            description: Combined account number and description
+          - name: Level1
+            description: Level 1 hierarchy category
+          - name: Level2
+            description: Level 2 hierarchy category
+          - name: Level3
+            description: Level 3 hierarchy category
+          - name: Level4
+            description: Level 4 hierarchy category
+          - name: Level5
+            description: Level 5 hierarchy category
+          - name: Level6
+            description: Level 6 hierarchy category
+          - name: Level7
+            description: Level 7 hierarchy category
+          - name: STMNT
+            description: Statement category/type
+          - name: "_meta/op"
+            description: CDC operation type (c=create, u=update, d=delete)
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published by Estuary Flow
+          - name: FLOW_DOCUMENT
+            description: Original JSON document from Flow
+            
+      - name: BCS_COA2
+        description: Secondary Chart of Accounts mapping
+        columns:
+          - name: NatAcct
+            description: Natural Account number
+          - name: "_meta/op"
+            description: CDC operation type
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published
+            
+      - name: BCS_ORG2
+        description: BCS Organization structure mapping
+        columns:
+          - name: "_meta/op"
+            description: CDC operation type
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published
+            
+      - name: CURRENCY_LINE
+        description: Currency exchange rate information
+        columns:
+          - name: CURRENCY_LINE_UID
+            description: Unique identifier for currency line
+          - name: "_meta/op"
+            description: CDC operation type
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published
+            
+      - name: OE_HDR
+        description: Order Entry Header - Sales order master records
+        columns:
+          - name: ORDER_NO
+            description: Order number (primary key)
+            tests:
+              - not_null
+              - unique
+          - name: CUSTOMER_ID
+            description: Customer identifier
+            tests:
+              - not_null
+          - name: ORDER_DATE
+            description: Date order was placed
+          - name: PROMISE_DATE
+            description: Promised delivery date
+          - name: REQUESTED_DATE
+            description: Customer requested date
+          - name: DATE_CREATED
+            description: Record creation timestamp
+          - name: DATE_LAST_MODIFIED
+            description: Last modification timestamp
+          - name: DATE_ORDER_COMPLETED
+            description: Order completion timestamp
+          - name: INVOICE_NO
+            description: Invoice number
+          - name: PO_NO
+            description: Purchase order number
+          - name: SHIP2_NAME
+            description: Ship-to name
+          - name: SHIP2_ADD1
+            description: Ship-to address line 1
+          - name: SHIP2_ADD2
+            description: Ship-to address line 2
+          - name: SHIP2_ADD3
+            description: Ship-to address line 3
+          - name: SHIP2_CITY
+            description: Ship-to city
+          - name: SHIP2_STATE
+            description: Ship-to state
+          - name: SHIP2_ZIP
+            description: Ship-to ZIP code
+          - name: SHIP2_COUNTRY
+            description: Ship-to country
+          - name: LOCATION_ID
+            description: Location/branch identifier
+          - name: COMPANY_ID
+            description: Company identifier
+          - name: ORDER_TYPE
+            description: Type of order
+          - name: COMPLETED
+            description: Order completion flag
+          - name: CANCEL_FLAG
+            description: Order cancellation flag
+          - name: DELETE_FLAG
+            description: Soft delete flag
+          - name: RMA_FLAG
+            description: Return merchandise authorization flag
+          - name: TAXABLE
+            description: Taxable order flag
+          - name: FREIGHT_OUT
+            description: Outbound freight amount
+          - name: FREIGHT_TAX
+            description: Freight tax amount
+          - name: GROSS_MARGIN
+            description: Gross margin amount
+          - name: PROFIT_PERCENT
+            description: Profit percentage
+          - name: "_meta/op"
+            description: CDC operation type (c=create, u=update, d=delete)
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published by Estuary Flow
+          - name: FLOW_DOCUMENT
+            description: Original JSON document from Flow
+        
+        # Table-specific freshness check for critical order data
+        freshness:
+          warn_after: {count: 2, period: hour}
+          error_after: {count: 6, period: hour}
+          
+      - name: PREDEFINED_COA
+        description: Predefined Chart of Accounts template
+        columns:
+          - name: "_meta/op"
+            description: CDC operation type
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published
+            
+      - name: RAW_CS_COA
+        description: Raw customer service Chart of Accounts
+        columns:
+          - name: "_meta/op"
+            description: CDC operation type
+          - name: FLOW_PUBLISHED_AT
+            description: Timestamp when record was published
+
+  # Bronze layer for raw data archival
+  - name: bronze_ingestion
+    description: Bronze layer - Raw data archive from various sources
+    database: "{{ var('source_database') }}"
+    schema: ING_BRONZE
+    
+    tables:
+      # Add bronze layer tables as they are identified
+      - name: raw_events
+        description: Raw event stream data
+        columns:
+          - name: event_id
+            description: Event identifier
+          - name: event_timestamp
+            description: Event occurrence timestamp
+          - name: payload
+            description: JSON payload

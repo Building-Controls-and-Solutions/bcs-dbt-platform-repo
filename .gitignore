@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# dbt
+target/
+dbt_packages/
+logs/
+*.log
+
+# Snowflake
+.snowflake/
+*.snowsql_history
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+
+# Credentials - NEVER commit these
+*.p8
+*.key
+*.pem
+terraform.tfvars
+override.auto.tfvars
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+~*
+
+# OS Files
+Thumbs.db
+.DS_Store
+
+# Claude
+.claude/settings.local.json

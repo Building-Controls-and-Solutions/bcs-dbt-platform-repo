@@ -1,0 +1,116 @@
+
+# BCS Platform dbt Project Configuration
+# This project manages all data transformations in Snowflake
+
+name: 'bcs_platform'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'bcs_platform'
+
+# These configurations specify where dbt should look for different types of files.
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+  - "logs"
+
+# Global variables that can be used in models
+vars:
+  # Default source database - can be overridden for dev vs prod
+  source_database: "{{ 'DB_DEV' if target.name in ['dev', 'ci', 'user_branch'] else 'DB_PROD' }}"
+  
+  # Ingestion schema prefix
+  ing_schema_prefix: 'ING_'
+  
+  # Date variables for incremental models
+  start_date: '2024-01-01'
+  
+  # Environment flag
+  is_production: "{{ target.name == 'prod' }}"
+  is_development: "{{ target.name in ['dev', 'user_branch'] }}"
+
+# Model configurations
+models:
+  bcs_platform:
+    # Global defaults
+    +on_schema_change: "sync_all_columns"
+    +persist_docs:
+      relation: true
+      columns: true
+    
+    # Staging models - read from ING_ schemas
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags: ['staging']
+      +docs:
+        node_color: "gold"
+    
+    # Intermediate models - business logic transformations
+    intermediate:
+      +materialized: "{{ 'view' if target.name != 'prod' else 'table' }}"
+      +schema: intermediate
+      +tags: ['intermediate']
+      +docs:
+        node_color: "orange"
+    
+    # Marts - final business-ready datasets
+    marts:
+      +materialized: "{{ 'view' if target.name != 'prod' else 'table' }}"
+      +schema: marts
+      +tags: ['marts']
+      +docs:
+        node_color: "green"
+      
+      # Specific mart configurations
+      core:
+        +materialized: table
+        +tags: ['core', 'marts']
+      
+      finance:
+        +tags: ['finance', 'marts']
+      
+      operations:
+        +tags: ['operations', 'marts']
+
+# Snapshot configurations
+snapshots:
+  bcs_platform:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: _updated_at
+    +invalidate_hard_deletes: true
+
+# Seed configurations
+seeds:
+  bcs_platform:
+    +schema: seeds
+    +quote_columns: true
+
+# Test configurations
+tests:
+  bcs_platform:
+    +severity: warn  # Default severity
+    +store_failures: "{{ target.name == 'prod' }}"  # Store failures in production
+
+# Query comment configuration
+query-comment:
+  comment: "{{ query_comment(node) }}"
+  append: true
+
+# Log configuration
+log-path: "logs"
+
+# Package configuration
+packages-install-path: "dbt_packages"
+
+# Require dbt version
+require-dbt-version: [">=1.10.0", "<2.0.0"]
