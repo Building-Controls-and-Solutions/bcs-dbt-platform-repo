@@ -104,7 +104,7 @@ tests:
 
 # Query comment configuration
 query-comment:
-  comment: "{{ query_comment(node) }}"
+  comment: "BCS dbt run - {{ target.name }}"
   append: true
 
 # Log configuration
