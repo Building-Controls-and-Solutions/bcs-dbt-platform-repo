@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data ingested from source systems
+    database: "{{ 'DB_PROD' if target.name == 'prod' else 'DB_DEV' }}"
+    schema: RAW
+    
+    tables:
+      - name: sample_data
+        description: Sample data for testing
+        columns:
+          - name: id
+            description: Unique identifier
+            tests:
+              - not_null
+              - unique
+          - name: created_at
+            description: Record creation timestamp
+            tests:
+              - not_null

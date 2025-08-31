@@ -1,0 +1,81 @@
+# DBT Project Configuration for BCS Snowflake Platform
+name: 'bcs_dbt_platform'
+version: '1.0.0'
+config-version: 2
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'bcs_dbt_platform'
+
+# These configurations specify where dbt should look for different types of files.
+# The `source-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["data"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+models:
+  bcs_dbt_platform:
+    # Config for all models
+    +materialized: view
+    
+    # Staging layer configuration
+    staging:
+      +materialized: view
+      +schema: staging
+    
+    # Intermediate layer configuration  
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+    
+    # Marts layer configuration
+    marts:
+      +materialized: table
+      +schema: marts
+      
+      # Specific mart configurations
+      core:
+        +materialized: table
+      reporting:
+        +materialized: table
+      
+# Configure seeds
+seeds:
+  bcs_dbt_platform:
+    +schema: seeds
+    
+# Configure snapshots
+snapshots:
+  bcs_dbt_platform:
+    +target_schema: snapshots
+    +strategy: timestamp
+    +updated_at: updated_at
+
+# Configure tests
+tests:
+  bcs_dbt_platform:
+    +severity: warn
+    +store_failures: true
+
+# Variables that can be used throughout the project
+vars:
+  # Date variables for incremental models
+  start_date: '2024-01-01'
+  
+  # Environment-specific variables
+  is_production: "{{ target.name == 'prod' }}"
+  
+  # Data freshness thresholds (in hours)
+  freshness_error_threshold: 48
+  freshness_warn_threshold: 24
