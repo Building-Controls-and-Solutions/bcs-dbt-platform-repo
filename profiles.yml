@@ -91,4 +91,4 @@ bcs_platform:
       # Connection settings
       threads: 4
       client_session_keep_alive: False
-      query_tag: 'dbt_branch_{{ env_var("GIT_BRANCH", "feature") }}
+      query_tag: 'dbt_branch_{{ env_var("GIT_BRANCH", "feature") }}'
